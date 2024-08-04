@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const FlowChart = () => {
+  const [hoveredTopic, setHoveredTopic] = useState(null);
+
   const topics = [
     { id: 'arrays', label: 'Arrays & Hashing', x: 50, y: 50 },
     { id: 'twoPointers', label: 'Two Pointers', x: 200, y: 150 },
@@ -33,7 +36,7 @@ const FlowChart = () => {
         const from = topics.find(t => t.id === connection.from);
         const to = topics.find(t => t.id === connection.to);
         return (
-          <line
+          <motion.line
             key={index}
             x1={from.x}
             y1={from.y}
@@ -41,26 +44,61 @@ const FlowChart = () => {
             y2={to.y}
             stroke="currentColor"
             strokeWidth="2"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 1, delay: index * 0.1 }}
           />
         );
       })}
       {topics.map((topic) => (
-        <g key={topic.id}>
-          <circle
+        <g key={topic.id} onMouseEnter={() => setHoveredTopic(topic.id)} onMouseLeave={() => setHoveredTopic(null)}>
+          <motion.circle
             cx={topic.x}
             cy={topic.y}
             r="30"
             fill="currentColor"
             className="text-primary"
+            whileHover={{ scale: 1.2 }}
+            transition={{ type: 'spring', stiffness: 300 }}
           />
-          <text
+          <motion.text
             x={topic.x}
             y={topic.y + 45}
             textAnchor="middle"
             className="text-sm font-medium"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
           >
             {topic.label}
-          </text>
+          </motion.text>
+          {hoveredTopic === topic.id && (
+            <motion.rect
+              x={topic.x - 60}
+              y={topic.y - 60}
+              width="120"
+              height="40"
+              rx="5"
+              fill="currentColor"
+              className="text-secondary"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          )}
+          {hoveredTopic === topic.id && (
+            <motion.text
+              x={topic.x}
+              y={topic.y - 35}
+              textAnchor="middle"
+              className="text-xs font-medium text-primary"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              Click to explore
+            </motion.text>
+          )}
         </g>
       ))}
     </svg>
